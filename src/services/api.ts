@@ -93,8 +93,15 @@ class N8NService {
 
       const due = taskData.due_timestamp || taskData.due_date || undefined;
 
+      // Generate a proper ID if not provided
+      const taskId = taskData.id
+        ? taskData.id.toString()
+        : taskData.row_number
+        ? taskData.row_number.toString()
+        : `task-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
       const task: Task = {
-        id: (taskData.id || taskData.row_number || Date.now()).toString(),
+        id: taskId,
         text: taskData.text || taskText,
         parsedCommand: taskData.parsed_command || taskData.parsedCommand || "",
         status: taskData.status || "pending",

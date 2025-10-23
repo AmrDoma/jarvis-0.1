@@ -100,43 +100,13 @@ function App() {
       const result = await n8nService.addTask(message);
 
       if (result.success && result.data) {
-        // Parse the nested response structure
-        let taskData: any = result.data;
-        let chatResponse = "";
+        // Use the task data returned from the API service
+        // which has already parsed and assigned the correct ID
+        const newTask = result.data;
+        const chatResponse = result.message || "Task added successfully!";
 
-        // Check if response has the nested structure
-        if ("content" in taskData && taskData.content?.parts?.[0]?.text) {
-          try {
-            const parsedData = JSON.parse(taskData.content.parts[0].text);
-            chatResponse = parsedData.chat_response || "";
-
-            // Create task from parsed data
-            const newTask: Task = {
-              id: parsedData.id,
-              text: parsedData.text || message,
-              parsedCommand: parsedData.parsed_command,
-              status: parsedData.status || "pending",
-              createdAt: new Date().toISOString(),
-              dueDate: parsedData.due_timestamp,
-              priority:
-                parsedData.priority === "normal"
-                  ? "medium"
-                  : parsedData.priority,
-            };
-
-            // Add the task
-            setTasks((prev) => [newTask, ...prev]);
-          } catch (parseError) {
-            console.error("Failed to parse response:", parseError);
-            showNotification("Failed to parse task response", "error");
-            setIsLoading(false);
-            return;
-          }
-        } else {
-          // Fallback to old format
-          setTasks((prev) => [result.data!, ...prev]);
-          chatResponse = result.message || "Task added successfully!";
-        }
+        // Add the task
+        setTasks((prev) => [newTask, ...prev]);
 
         // Add JARVIS response to message history
         if (chatResponse) {
