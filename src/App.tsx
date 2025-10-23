@@ -112,7 +112,7 @@ function App() {
 
             // Create task from parsed data
             const newTask: Task = {
-              id: `task-${Date.now()}`,
+              id: parsedData.id,
               text: parsedData.text || message,
               parsedCommand: parsedData.parsed_command,
               status: parsedData.status || "pending",
