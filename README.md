@@ -9,6 +9,7 @@ A web app that lets you manage tasks using natural language. Tell JARVIS what yo
 - Tracks task status and priorities
 - Shows conversation history
 - Syncs with n8n for workflow automation
+- Sends Discord reminders every two hours and notifications upon task creation
 
 ## Getting Started
 
@@ -16,7 +17,10 @@ A web app that lets you manage tasks using natural language. Tell JARVIS what yo
 
 - Node.js 18+
 - n8n instance (cloud or self-hosted)
-- Google Sheets (easiest) or Supabase/PostgreSQL
+- Google Sheets (easiest) or any form of DB
+- Demo sheet: https://docs.google.com/spreadsheets/d/1lVtA7MFdNQRk0VBQf1hbshQIQOgNF0mKdeTM4QXbglM/edit?usp=sharing
+- Demo n8n:<img width="1217" height="762" alt="image" src="https://github.com/user-attachments/assets/db11d462-6fd8-4d6f-ab37-eec81a62a29c" />
+
 
 ### Install
 
@@ -30,7 +34,7 @@ Opens at `http://localhost:5173`
 ### Setup
 
 1. Click the settings gear icon
-2. Enter your n8n webhook URL: `https://your-n8n.com/webhook-test`
+2. Enter your n8n webhook URL: `https://your-n8n.com/webhook`
 3. Test the connection
 4. Start adding tasks
 
@@ -42,6 +46,7 @@ Opens at `http://localhost:5173`
 GET  /tasks          - Returns all tasks
 POST /add-task       - Creates new task (message as query param)
 POST /update-task    - Updates task status (id + status in body)
+DELETE /delete-task  - Deletes a task (id in body)
 ```
 
 ### Task Structure
@@ -94,7 +99,6 @@ Response:
 
 - Scrollable conversation between you and JARVIS
 - Auto-scrolls to latest message
-- Saved in localStorage
 
 ### Error Handling
 
@@ -143,13 +147,8 @@ Done tasks can go back to any status.
 
 **Easiest: Google Sheets**
 
-- See QUICKSTART-GOOGLE-SHEETS.md
 - No server setup needed
 
-**Better: Supabase**
-
-- Free PostgreSQL database
-- Check SETUP.md for instructions
 
 ## Notes
 
@@ -169,29 +168,3 @@ Output in `dist/` folder.
 
 Built with React + TypeScript + Vite
 
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-globalIgnores(['dist']),
-{
-files: ['**/*.{ts,tsx}'],
-extends: [
-// Other configs...
-// Enable lint rules for React
-reactX.configs['recommended-typescript'],
-// Enable lint rules for React DOM
-reactDom.configs.recommended,
-],
-languageOptions: {
-parserOptions: {
-project: ['./tsconfig.node.json', './tsconfig.app.json'],
-tsconfigRootDir: import.meta.dirname,
-},
-// other options...
-},
-},
-])
-
-```
-
-```
