@@ -1,314 +1,174 @@
-# 🤖 JARVIS - Your Personal AI Task Assistant
+# JARVIS - Personal AI Assistant
 
-A beautiful, modern web application that serves as your personal AI assistant, powered by n8n workflows. JARVIS helps you manage tasks and reminders through natural language, with AI-powered command parsing and automated hourly check-ins.
+A web app that lets you manage tasks using natural language. Tell JARVIS what you need to do, and it figures out the rest using AI through n8n workflows.
 
-![JARVIS Preview](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)
-![React](https://img.shields.io/badge/React-19.1-blue?style=for-the-badge&logo=react)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue?style=for-the-badge&logo=typescript)
-![n8n](https://img.shields.io/badge/n8n-Integration-orange?style=for-the-badge)
+## What It Does
 
-## ✨ Features
+- Type tasks in plain English (no special syntax needed)
+- AI parses your commands automatically
+- Tracks task status and priorities
+- Shows conversation history
+- Syncs with n8n for workflow automation
 
-- 🎯 **Natural Language Input** - Just type what you need in plain English
-- 🤖 **AI-Powered** - Transforms natural sentences into actionable commands via n8n
-- 📱 **Multiple Input Channels** - Web app and Discord integration
-- ⏰ **Smart Reminders** - Hourly checks to keep you on track
-- 🎨 **Beautiful UI** - Dark theme inspired by Iron Man's JARVIS
-- 💾 **Persistent Storage** - Tasks saved locally with n8n sync
-- 📊 **Task Management** - Track status (pending, in-progress, done)
-- 🔄 **Real-time Sync** - Seamless integration with your n8n workflow
+## Getting Started
 
-## 🚀 Quick Start
+### You Need
 
-### Prerequisites
+- Node.js 18+
+- n8n instance (cloud or self-hosted)
+- Google Sheets (easiest) or Supabase/PostgreSQL
 
-- Node.js (v18 or higher)
-- npm or yarn
-- An n8n instance (free cloud or self-hosted)
-- **Database** (pick the easiest):
-  - 📊 **Google Sheets** - Simplest! No setup needed → [Quick Guide](./QUICKSTART-GOOGLE-SHEETS.md)
-  - 🚀 **Supabase** - Free 500MB PostgreSQL with dashboard
-  - 💾 **n8n Built-in** - Zero external dependencies
+### Install
 
-### Installation
-
-1. **Clone and navigate to the project:**
-
-   ```bash
-   cd jarvis-0.1
-   ```
-
-2. **Install dependencies:**
-
-   ```bash
-   npm install axios date-fns lucide-react
-   npm install
-   ```
-
-3. **Start the development server:**
-
-   ```bash
-   npm run dev
-   ```
-
-4. **Open your browser:**
-   Navigate to `http://localhost:5173`
-
-### First Time Setup
-
-**→ New to this?** Start with Google Sheets (5 min setup):
-
-- Read [QUICKSTART-GOOGLE-SHEETS.md](./QUICKSTART-GOOGLE-SHEETS.md)
-- No database knowledge required!
-
-**→ Want more power?** Use Supabase (free):
-
-- See [SETUP.md](./SETUP.md) - Database section
-- PostgreSQL with API included
-
-## ⚙️ Configuration
-
-### Setting up n8n Webhook
-
-1. Click the **Settings** icon (⚙️) in the top right
-2. Enter your n8n webhook base URL (e.g., `https://your-n8n-instance.com/webhook`)
-3. Click **Test Connection** to verify
-4. Save your settings
-
-### Required n8n Endpoints
-
-Your n8n workflow should expose these endpoints:
-
-```
-POST   /webhook/add-task      - Add a new task
-GET    /webhook/tasks         - Fetch all tasks
-POST   /webhook/update-task   - Update task status
-POST   /webhook/delete-task   - Delete a task
-GET    /webhook/ping          - Health check
+```bash
+npm install
+npm run dev
 ```
 
-### Example n8n Workflow Structure
+Opens at `http://localhost:5173`
+
+### Setup
+
+1. Click the settings gear icon
+2. Enter your n8n webhook URL: `https://your-n8n.com/webhook-test`
+3. Test the connection
+4. Start adding tasks
+
+## How It Works
+
+### Your n8n Workflow Needs These Endpoints
 
 ```
-1. Webhook Trigger
-2. AI Agent Node (OpenAI/Claude) - Parse natural language
-3. Data Transformation
-4. Storage Node (choose one):
-   - Google Sheets (simplest)
-   - Supabase (recommended)
-   - n8n built-in (easiest)
-5. Discord Node (optional)
-6. Response Node
+GET  /tasks          - Returns all tasks
+POST /add-task       - Creates new task (message as query param)
+POST /update-task    - Updates task status (id + status in body)
 ```
 
-### Storage Options
-
-- **Google Sheets** - No setup, visual, perfect for beginners
-- **Supabase** - Free cloud database (500MB), PostgreSQL power
-- **n8n Built-in** - Zero setup, stored in workflow memory
-
-## 📦 Project Structure
-
-```
-jarvis-0.1/
-├── src/
-│   ├── components/
-│   │   ├── ChatInput.tsx      # Natural language input
-│   │   ├── TaskList.tsx       # Task display & management
-│   │   └── Settings.tsx       # Configuration panel
-│   ├── services/
-│   │   └── api.ts             # n8n API integration
-│   ├── types.ts               # TypeScript interfaces
-│   ├── App.tsx                # Main application
-│   ├── App.css                # Component styles
-│   ├── index.css              # Global styles
-│   └── main.tsx               # Entry point
-├── package.json
-├── vite.config.ts
-├── tsconfig.json
-└── README.md
-```
-
-## 🎨 UI Components
-
-### Task Input
-
-- Type naturally: "Remind me to call John at 3pm tomorrow"
-- Press Enter to send, Shift+Enter for new line
-- Real-time feedback with loading states
-
-### Task List
-
-- **Active Tasks** - Pending and in-progress items
-- **Completed Tasks** - Finished items (collapsed)
-- Status indicators with icons
-- Priority badges (high, medium, low)
-- Due date display
-
-### Settings Panel
-
-- n8n webhook URL configuration
-- Connection testing
-- Discord integration toggle
-
-## 🔧 API Integration
-
-### Adding a Task
+### Task Structure
 
 ```typescript
-const result = await n8nService.addTask("Schedule meeting tomorrow at 2pm");
-// Sends POST to: /webhook/add-task
-// Body: { text: "...", timestamp: "..." }
-```
-
-### Task Data Structure
-
-```typescript
-interface Task {
-  id: string;
-  text: string;
-  parsedCommand?: string; // AI-parsed command
-  status: "pending" | "in-progress" | "done";
-  createdAt: string;
-  dueDate?: string;
-  reminderSent?: boolean;
-  priority?: "low" | "medium" | "high";
+{
+  id: string
+  text: string              // Original message
+  parsedCommand: string     // AI-extracted command
+  status: "pending" | "in-progress" | "done"
+  createdAt: string
+  dueDate?: string
+  priority?: "low" | "medium" | "high"
 }
 ```
 
-## 🎯 Usage Examples
+### Example Request/Response
 
-### Example Commands
+**Adding a task:**
 
-- "Remind me to call Sarah tomorrow at 3pm"
-- "Add task: finish the report by Friday"
-- "Schedule meeting with team next Monday"
-- "Don't forget to buy groceries today"
-- "Set reminder for gym at 6am daily"
+```
+POST /add-task?message=remind me to drink water
 
-### Expected n8n Response
-
-```json
+Response:
 {
-  "task": {
-    "id": "uuid",
-    "text": "Call Sarah tomorrow at 3pm",
-    "parsedCommand": "schedule_call('Sarah', '2025-10-24T15:00:00')",
-    "status": "pending",
-    "createdAt": "2025-10-23T10:00:00Z",
-    "dueDate": "2025-10-24T15:00:00Z",
-    "priority": "medium"
+  "content": {
+    "parts": [{
+      "text": "{
+        \"text\": \"remind me to drink water\",
+        \"parsed_command\": \"drink water\",
+        \"status\": \"pending\",
+        \"due_timestamp\": \"2023-10-26T23:59:59Z\",
+        \"priority\": \"normal\",
+        \"chat_response\": \"Got it. I'll remind you to drink water.\"
+      }"
+    }]
   }
 }
 ```
 
-## 🔌 Discord Integration
+## Features
 
-When Discord is enabled in settings:
+### Task Preview
 
-1. Tasks can be added via Discord commands
-2. n8n workflow handles both web and Discord inputs
-3. Reminders sent to both channels
-4. Status updates synced across platforms
+- Shows 2 most recent tasks
+- "Read More" button opens modal with all tasks
+- Click status icon to change: pending → in progress → done (and back)
 
-## 🎨 Theming
+### Chat History
 
-The app features a dark, futuristic theme inspired by JARVIS from Iron Man:
+- Scrollable conversation between you and JARVIS
+- Auto-scrolls to latest message
+- Saved in localStorage
 
-- Deep blue/purple gradients
-- Glowing accent colors (#60a5fa)
-- Smooth animations
-- Glassmorphic design elements
+### Error Handling
 
-### Color Palette
+- "No new command" responses show helpful error
+- Invalid commands get clear feedback
+- Chat history includes error messages
 
-```css
---bg-primary: #0a0e27
---bg-secondary: #1a1f3a
---accent-primary: #60a5fa
---accent-secondary: #818cf8
---success: #22c55e
---warning: #f59e0b
---error: #ef4444
+## Project Layout
+
+```
+src/
+├── components/
+│   ├── ChatInput.tsx         # Message input
+│   ├── ChatHistory.tsx       # Conversation display
+│   ├── TaskList.tsx          # Task cards
+│   ├── TaskModal.tsx         # All tasks view
+│   ├── StatusDropdown.tsx    # Status selector
+│   └── Settings.tsx          # Config panel
+├── services/
+│   └── api.ts                # n8n integration
+├── types.ts                  # TypeScript definitions
+└── App.tsx                   # Main component
 ```
 
-## 🚀 Building for Production
+## Usage
+
+Just type naturally:
+
+- "remind me to call mom tomorrow at 3"
+- "buy groceries before 6pm"
+- "meeting with team on Friday"
+
+JARVIS parses it, creates the task, and responds in the chat.
+
+### Changing Status
+
+Click the status icon on any task to see options:
+
+- ○ Pending
+- ⏰ In Progress
+- ✓ Done
+
+Done tasks can go back to any status.
+
+## Database Setup
+
+**Easiest: Google Sheets**
+
+- See QUICKSTART-GOOGLE-SHEETS.md
+- No server setup needed
+
+**Better: Supabase**
+
+- Free PostgreSQL database
+- Check SETUP.md for instructions
+
+## Notes
+
+- Tasks stored in localStorage + synced with n8n
+- Messages saved locally
+- Webhook URL required before using
+
+## Build
 
 ```bash
-# Build the app
 npm run build
-
-# Preview the build
-npm run preview
 ```
 
-The build output will be in the `dist/` directory.
-
-## 📝 Development
-
-### Run Development Server
-
-```bash
-npm run dev
-```
-
-### Lint Code
-
-```bash
-npm run lint
-```
-
-### Type Check
-
-```bash
-npm run build
-```
-
-## 🔐 Security Notes
-
-- Store n8n webhook URLs securely
-- Use HTTPS for production n8n instances
-- Implement authentication in your n8n workflow
-- Never commit API keys or secrets
-
-## 🐛 Troubleshooting
-
-### Connection Failed
-
-- Verify n8n webhook URL is correct
-- Check if n8n instance is running
-- Ensure CORS is enabled on n8n
-
-### Tasks Not Syncing
-
-- Check browser console for errors
-- Verify n8n workflow endpoints
-- Test connection in Settings panel
-
-### Styling Issues
-
-- Clear browser cache
-- Check if all dependencies installed
-- Verify CSS imports in components
-
-## 🤝 Contributing
-
-Feel free to fork, improve, and submit pull requests!
-
-## 📄 License
-
-MIT License - feel free to use this for your own projects
-
-## 🙏 Acknowledgments
-
-- Built with React 19 + TypeScript
-- Powered by Vite
-- Icons by Lucide React
-- Inspired by Iron Man's JARVIS
+Output in `dist/` folder.
 
 ---
 
-**Made with ❤️ for productivity enthusiasts**
+Built with React + TypeScript + Vite
+
 import reactDom from 'eslint-plugin-react-dom'
 
 export default defineConfig([
