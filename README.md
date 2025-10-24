@@ -34,9 +34,9 @@ Opens at `http://localhost:5173`
 ### Setup
 
 1. Click the settings gear icon
-2. Enter your n8n webhook URL: `https://your-n8n.com/webhook`
-3. Test the connection
-4. Start adding tasks
+2. Enter your n8n webhook URL (or use mine): 'https://amrdoma.app.n8n.cloud/webhook`
+4. Test the connection
+5. Start adding tasks
 
 ## How It Works
 
